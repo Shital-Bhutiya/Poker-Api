@@ -18,6 +18,11 @@ namespace Poker
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+            routes.MapRoute(
+                name: "Route2",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "PokerTable", action = "Get", id = UrlParameter.Optional }
+            );
         }
     }
 }
