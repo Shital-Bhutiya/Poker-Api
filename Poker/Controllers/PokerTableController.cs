@@ -69,46 +69,48 @@ namespace Poker.Controllers
         private void checkWinner(ICollection<ResultStatus> resultStatuses)
         {
             // Check for flush winner or tie for flush
-            if (resultStatuses.Where(p => p.isFlush == true).Count() == 1)
+            var result = resultStatuses.GroupBy(g => g.isFlush == true).Where(g => g.Count() > 1).Count();
+
+            if (resultStatuses.GroupBy(g => g.isFlush == true).Where(g => g.Count() > 1).Count() > 1)
             {
-                var finalresult = resultStatuses.FirstOrDefault(f => f.isFlush == true);
-                Winner = finalresult.Name;
-            }
-            else if (resultStatuses.Where(g => g.isFlush == true).Count() > 1)
-            {
-                var players = resultStatuses.Where(g => g.isFlush == true);
+                var players = resultStatuses.Where(g => g.isFlush == true).ToList();
                 Winner = "The Game is tie with:";
                 foreach (var player in players)
                 {
                     Winner += player.Name + " ";
                 }
             }
-
-            // Check for Three of kind posibility or tie for that
-            else if (resultStatuses.Where(p => p.isTreeofKind == true).Count() == 1)
+            else if (resultStatuses.GroupBy(g => g.isFlush == true).Where(g => g.Count() > 1).Count() == 1)
             {
-                var finalresult = resultStatuses.FirstOrDefault(f => f.isTreeofKind == true);
+                var finalresult = resultStatuses.Where(f => f.isFlush == true).FirstOrDefault();
                 Winner = finalresult.Name;
             }
-            else if (resultStatuses.GroupBy(g => g.isTreeofKind).Count() > 1)
+
+            // Check for Three of kind posibility or tie for that
+            else if (resultStatuses.GroupBy(g => g.isTreeofKind == true).Where(g => g.Count() > 1).Count() > 1)
             {
-                var players = resultStatuses.Where(g => g.isTreeofKind == true);
+                var players = resultStatuses.Where(g => g.isTreeofKind == true).ToList();
                 Winner = "";
                 foreach (var player in players)
                 {
                     Winner += player.Name + "";
                 }
             }
-
-            // Check for one pair or tie for that.
-            else if (resultStatuses.Where(p => p.isOnePair == true).Count() == 1)
+            else if (resultStatuses.GroupBy(g => g.isTreeofKind == true).Where(g => g.Count() > 1).Count() == 1)
             {
-                var finalresult = resultStatuses.FirstOrDefault(f => f.isOnePair == true);
+                var finalresult = resultStatuses.FirstOrDefault(f => f.isTreeofKind == true);
                 Winner = finalresult.Name;
             }
-            else if (resultStatuses.GroupBy(g => g.isOnePair).Count() > 1)
+
+            // Check for one pair or tie for that.
+            else if (resultStatuses.GroupBy(g => g.isOnePair == true).Where(g => g.Count() > 1).Count() > 1)
             {
-                var players = resultStatuses.Where(g => g.isOnePair == true);
+                var finalresult = resultStatuses.Where(f => f.isOnePair == true).FirstOrDefault();
+                Winner = finalresult.Name;
+            }
+            else if (resultStatuses.GroupBy(g => g.isOnePair == true).Where(g => g.Count() > 1).Count() == 1)
+            {
+                var players = resultStatuses.Where(g => g.isOnePair == true).ToList();
                 Winner = "";
                 foreach (var player in players)
                 {
@@ -125,11 +127,11 @@ namespace Poker.Controllers
         }
 
         // sort by enum
-        private ICollection<Card> Sort(ICollection<Card> cards)
-        {
-            cards = cards.OrderBy(e => (int)e.Rank).ToList();
-            return cards;
-        }
+        //private ICollection<Card> Sort(ICollection<Card> cards)
+        //{
+        //    cards = cards.OrderBy(e => (int)e.Rank).ToList();
+        //    return cards;
+        //}
 
     }
 }

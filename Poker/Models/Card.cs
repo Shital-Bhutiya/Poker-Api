@@ -12,7 +12,8 @@ public enum Suit
 }
 public enum Rank
 {
-    Two=2,
+    Ace,
+    Two,
     Three,
     Four,
     Five,
@@ -23,15 +24,14 @@ public enum Rank
     Ten,
     Jack,
     Queen,
-    King,
-    Ace
+    King
 }
 
 namespace Poker.Models
 {
     public class Card
     {
-        public Suit Suit { get; set; }
-        public Rank Rank { get; set; }
+        public string Suit { get; set; }
+        public string Rank { get; set; }
     }
 }
