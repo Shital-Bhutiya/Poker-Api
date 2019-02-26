@@ -7,6 +7,9 @@ namespace Poker.Models
 {
     public class ResultStatus
     {
+        internal bool isFourOfKind;
+        internal bool isFullHouse;
+
         public string Name { get; set; }
         public bool isFlush { get; set; }
         public bool isOnePair { get; set; }

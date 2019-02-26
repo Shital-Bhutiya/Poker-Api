@@ -36,17 +36,15 @@ namespace Poker.Controllers
                 isPokerHand(hand.Cards, resultStatus);
                 resultStatuses.Add(resultStatus);
             }
-            checkWinner(resultStatuses);
-            if (Winner == "")
-            {
-                //checkHighCard()
-            }
+            checkWinner(resultStatuses);    
             return Winner;
         }
 
         private void isPokerHand(ICollection<Card> cards, ResultStatus resultStatus)
         {
+            resultStatus.isFullHouse = checkFullHouse(cards);
             resultStatus.isFlush = checkFlush(cards);
+            resultStatus.isFourOfKind = checkFourOfKind(cards);
             resultStatus.isTreeofKind = checkThreeOfKind(cards);
             resultStatus.isOnePair = checkOnePair(cards);
             resultStatus.isHighCard = false;
@@ -64,16 +62,58 @@ namespace Poker.Controllers
         public bool checkThreeOfKind(ICollection<Card> Cards)
         {
             return Cards.GroupBy(h => h.Rank)
-                        .Where(g => g.Count() >= 3)
-                        .Count() == 3;
+                        .Where(g => g.Count() == 3)
+                        .Count() == 1;
+        }
+
+        public bool checkFourOfKind(ICollection<Card> Cards)
+        {
+            return Cards.GroupBy(h => h.Rank)
+                        .Where(g => g.Count() == 4)
+                        .Count() == 1;
+        }
+
+        public bool checkFullHouse(ICollection<Card> Cards)
+        {
+            return checkThreeOfKind(Cards) && checkOnePair(Cards);
         }
 
         private void checkWinner(ICollection<ResultStatus> resultStatuses)
         {
-            // Check for flush winner or tie for flush
-            var result = resultStatuses.Where(g => g.isFlush == true).GroupBy(g => g.isFlush).Count();
+            // check for four of kind or tie 
+            if (resultStatuses.Where(g => g.isFourOfKind == true).GroupBy(g => g.isFourOfKind).Count() > 1)
+            {
+                var players = resultStatuses.Where(g => g.isFourOfKind == true).ToList();
+                Winner = "The Game is Tie : ";
+                foreach (var player in players)
+                {
+                    Winner += player.Name + "";
+                }
+            }
+            else if (resultStatuses.Where(g => g.isFourOfKind == true).GroupBy(g => g.isFourOfKind).Count() == 1)
+            {
+                var finalresult = resultStatuses.FirstOrDefault(f => f.isFourOfKind == true);
+                Winner = "The Winner is : " + finalresult.Name;
+            }
 
-            if (resultStatuses.Where(g => g.isFlush == true).GroupBy(g => g.isFlush).Count() > 1)
+            // Check for full house winner or tie
+            else if (resultStatuses.Where(g => g.isFullHouse == true).GroupBy(g => g.isFullHouse).Count() > 1)
+            {
+                var players = resultStatuses.Where(g => g.isFullHouse == true).ToList();
+                Winner = "The Game is tie with:";
+                foreach (var player in players)
+                {
+                    Winner += player.Name + " ";
+                }
+            }
+            else if (resultStatuses.Where(g => g.isFullHouse == true).GroupBy(g => g.isFullHouse).Count() == 1)
+            {
+                var finalresult = resultStatuses.Where(f => f.isFullHouse == true).FirstOrDefault();
+                Winner = "The Winner is " + finalresult.Name;
+            }
+
+            // check for flush winner or tie
+            else if (resultStatuses.Where(g => g.isFlush == true).GroupBy(g => g.isFlush).Count() > 1)
             {
                 var players = resultStatuses.Where(g => g.isFlush == true).ToList();
                 Winner = "The Game is tie with:";
@@ -88,7 +128,7 @@ namespace Poker.Controllers
                 Winner = "The Winner is "+finalresult.Name;
             }
 
-            // Check for Three of kind posibility or tie for that
+            // Check for Three of kind posibility or tie
             else if (resultStatuses.Where(g => g.isTreeofKind == true).GroupBy(g => g.isTreeofKind).Count() > 1)
             {
                 var players = resultStatuses.Where(g => g.isTreeofKind == true).ToList();
@@ -104,7 +144,7 @@ namespace Poker.Controllers
                 Winner = "The Winner is : "+finalresult.Name;
             }
 
-            // Check for one pair or tie for that.
+            // Check for one pair or tie
             else if (resultStatuses.Where(g => g.isOnePair == true).GroupBy(g => g.isOnePair).Count() > 1)
             {
                 var finalresult = resultStatuses.Where(f => f.isOnePair == true).FirstOrDefault();
@@ -119,21 +159,6 @@ namespace Poker.Controllers
                     Winner += player.Name + " ";
                 }
             }
-
-            // Check for high card if none of above is successed
-            if (resultStatuses.Where(p => p.isFlush == true).Count() == 0 && resultStatuses.Where(p => p.isOnePair == true).Count() == 0 && resultStatuses.Where(p => p.isTreeofKind == true).Count() == 0)
-            {
-
-            }
-
         }
-
-        // sort by enum
-        //private ICollection<Card> Sort(ICollection<Card> cards)
-        //{
-        //    cards = cards.OrderBy(e => (int)e.Rank).ToList();
-        //    return cards;
-        //}
-
     }
 }
