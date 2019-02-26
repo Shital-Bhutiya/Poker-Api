@@ -21,6 +21,7 @@ namespace Poker.Controllers
         [HttpGet]
         public string Get([FromUri]string pokerTable)
         {
+            // deserialize the json object
             PokerTable table = JsonConvert.DeserializeObject<PokerTable>(pokerTable);
             return getPokerHands(table.PokerHands);
         }
@@ -28,7 +29,7 @@ namespace Poker.Controllers
         private string getPokerHands(ICollection<PokerHand> pokerHands)
         {
             resultStatuses = new HashSet<ResultStatus>();
-
+            //set results
             foreach (PokerHand hand in pokerHands)
             {
                 var resultStatus = new ResultStatus();
@@ -36,6 +37,7 @@ namespace Poker.Controllers
                 isPokerHand(hand.Cards, resultStatus);
                 resultStatuses.Add(resultStatus);
             }
+            //check winner
             checkWinner(resultStatuses);    
             return Winner;
         }
